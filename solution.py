@@ -1,5 +1,5 @@
 import pygame
-from random import random
+from random import random, uniform
 from math import sqrt
 
 SCREEN_SIZE = (1280, 720)
@@ -37,7 +37,7 @@ class Line():
     def add_vector(cls, vector):
         Line.vectors.append(vector)
 
-    def draw_points(cls, points='Line.vectors', style="line", width=4, color=(255, 255, 255)):
+    def draw_points(cls, points='Line.vectors', style="points", width=4, color=(255, 255, 255)):
         if points == 'Line.vectors':
             if style == "line":
                 for point_number in range(-1, len(Line.vectors) - 1):
@@ -106,7 +106,8 @@ class Help():
         font1 = pygame.font.SysFont("arial", 30)
         font2 = pygame.font.SysFont("serif", 30)
         data = [["F1", "Помощь"], ["R", "Перезапуск"], ["P", "Воспроизвести / Пауза"], ["Num+", "Добавить точку"],
-                ["Num-", "Удалить точку"], ["", ""], [str(steps), "текущих точек"]]
+                ["Num-", "Удалить точку"], ["H", "Ускорение движения"], ["L", "Замедление движения"],
+                ["", ""], [count_points, "текущих точек"]]
 
         pygame.draw.lines(gameDisplay, (255, 50, 50, 255), True, [
             (0, 0), (800, 0), (800, 600), (0, 600)], 5)
@@ -132,6 +133,7 @@ if __name__ == "__main__":
     color = pygame.Color(0)
 
     while working:
+        count_points = str(len(Line.vectors))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 working = False
@@ -144,10 +146,27 @@ if __name__ == "__main__":
                     pause = not pause
                 if event.key == pygame.K_KP_PLUS:
                     steps += 1
+                    line.add_vector(Vector((uniform(1, 1279), uniform(1, 720))))
                 if event.key == pygame.K_F1:
                     show_help = not show_help
                 if event.key == pygame.K_KP_MINUS:
                     steps -= 1 if steps > 1 else 0
+                    try:
+                        Line.vectors.pop()
+                    except:
+                        pass
+                if event.key == pygame.K_h:
+                    for vector in Line.vectors:
+                        sp0 = vector.speed[0]
+                        sp1 = vector.speed[1]
+                        vector.speed = (sp0 * 1.2, sp1 * 1.2)
+                if event.key == pygame.K_l:
+                    for vector in Line.vectors:
+                        sp0 = vector.speed[0]
+                        sp1 = vector.speed[1]
+                        vector.speed = (sp0 * 0.8, sp1 * 0.8)
+
+
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 line.add_vector(Vector(event.pos))
